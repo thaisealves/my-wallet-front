@@ -15,13 +15,13 @@ export default function SignInPage() {
     event.preventDefault();
     setButtonCtt(<data.Component {...data.props} />);
     setDisable(true);
+
     let body = {
       email,
       password,
     };
     try {
-      await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
-      alert("estamos bem");
+     const resp = await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
       navigate("/transactions");
       setDisable(false);
       localStorage.setItem("token", resp.data.token);
@@ -110,8 +110,8 @@ const Forms = styled.form`
   input {
     box-sizing: border-box;
     border-radius: 5px;
-    width: 100%;
     border: none;
+    width: 100%;
     height: 58px;
     background-color: #ffffff;
     font-size: 20px;
