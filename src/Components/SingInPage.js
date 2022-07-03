@@ -21,13 +21,14 @@ export default function SignInPage() {
       password,
     };
     try {
-     const resp = await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
+      const resp = await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
+      localStorage.setItem("token", resp.data.token);
+      localStorage.setItem("name", resp.data.name);
+
       navigate("/transactions");
       setDisable(false);
-      localStorage.setItem("token", resp.data.token);
     } catch (error) {
       console.log(error);
-      alert(`${error.response.data}`);
       setDisable(false);
       setButtonCtt("Entrar");
     }

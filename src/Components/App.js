@@ -4,7 +4,7 @@ import UserContext from "./UserContext";
 import GlobalStyle from "./GlobalStyle";
 import SignInPage from "./SingInPage";
 import SignUpPage from "./SignUpPage";
-import Transactions from "./Transactions";
+import TransactionsPage from "./TransactionsPage";
 export default function App() {
   return (
     <UserContext.Provider>
@@ -14,7 +14,7 @@ export default function App() {
         <Routes>
           <Route path={"/"} element={<SignInPage />} />
           <Route path={"/sign-up"} element={<SignUpPage />} />
-          <Route path={"/transactions"} element={<Transactions />} />
+          <Route path={"/transactions"} element={<TransactionsPage />} />
         </Routes>
       </BrowserRouter>
     </UserContext.Provider>
