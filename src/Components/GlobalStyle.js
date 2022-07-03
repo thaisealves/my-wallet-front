@@ -21,6 +21,7 @@ time, mark, audio, video {
 	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
+	text-decoration: none;
 	
 }
 html{
@@ -34,7 +35,7 @@ footer, header, hgroup, menu, nav, section {
 body {
 	/* width: 100%; */
 	line-height: 1;
-	font-family: 'Lexend Deca', sans-serif; /* putting the same font for the whole code */
+	font-family: 'Raleway', sans-serif;; /* putting the same font for the whole code */
 }
 ol, ul {
 	list-style: none;

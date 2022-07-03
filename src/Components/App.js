@@ -6,11 +6,8 @@ import SignInPage from "./SingInPage";
 import SignUpPage from "./SignUpPage";
 import Transactions from "./Transactions";
 export default function App() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   return (
-    <UserContext.Provider value={{ email, setEmail, password, setPassword }}>
+    <UserContext.Provider>
       <BrowserRouter>
         <GlobalStyle />
 
