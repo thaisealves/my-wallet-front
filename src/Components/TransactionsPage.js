@@ -12,6 +12,7 @@ export default function TransactionsPage() {
   const { reloadTransactions } = useContext(TransactionsContext);
   let token = localStorage.getItem("token");
   let name = localStorage.getItem("name");
+  const [balance, setBalance] = useState(0);
   const navigate = useNavigate();
   const [allTransactions, setAllTransactions] = useState([]);
   useEffect(() => {
@@ -45,20 +46,26 @@ export default function TransactionsPage() {
     localStorage.clear();
     navigate("/");
   }
-
-  function ListTransactions() {
+  function EmptyBoard() {
     return (
-      <>
-        {allTransactions.map((value, ind) => (
-          <TransactionStyle key={ind}>
-            <div>
-              <span style={{ color: "#C6C6C6" }}>{value.day}</span>
-              <span>{value.description}</span>
-            </div>
-            <Price status={value.status}>{value.value}</Price>
-          </TransactionStyle>
-        ))}
-      </>
+      <NoRegister>
+        Não há registros de <br />
+        entrada ou saída
+      </NoRegister>
+    );
+  }
+
+  function ShowBoard() {
+    return (
+      <Board>
+        <ListTransactions
+          allTransactions={allTransactions}
+          setBalance={setBalance}
+        />
+        <Balance balance={Number(balance)}>
+          SALDO: <span>{Math.abs(Number(balance)).toFixed(2)}</span>
+        </Balance>
+      </Board>
     );
   }
 
@@ -68,10 +75,7 @@ export default function TransactionsPage() {
         <h1>Olá, {name}</h1>
         <IoExitOutline color="white" fontSize={"26px"} onClick={exit} />
       </Header>
-      <Board>
-        <ListTransactions />
-        <Balance>SALDO: </Balance>
-      </Board>
+      {allTransactions.length === 0 ? <EmptyBoard /> : <ShowBoard />}
       <Movements>
         <AddTransaction onClick={() => navigate("/inflow")}>
           <IoAddCircleOutline fontSize={"25px"} />
@@ -86,6 +90,35 @@ export default function TransactionsPage() {
         </AddTransaction>
       </Movements>
     </Container>
+  );
+}
+
+function ListTransactions({ allTransactions, setBalance }) {
+  useEffect(() => {
+    let newBalance = 0;
+    for (let i = 0; i < allTransactions.length; i++) {
+      if (allTransactions[i].status === "inflow") {
+        newBalance += Number(allTransactions[i].value);
+      } else if (allTransactions[i].status === "outflow") {
+        newBalance -= Number(allTransactions[i].value);
+      }
+      console.log(newBalance);
+    }
+    setBalance(newBalance);
+  }, [allTransactions]);
+
+  return (
+    <>
+      {allTransactions.map((value, ind) => (
+        <TransactionStyle key={ind}>
+          <div>
+            <span style={{ color: "#C6C6C6" }}>{value.day}</span>
+            <span>{value.description}</span>
+          </div>
+          <Price status={value.status}>{Number(value.value).toFixed(2)}</Price>
+        </TransactionStyle>
+      ))}
+    </>
   );
 }
 
@@ -118,6 +151,7 @@ const Board = styled.div`
   overflow: auto;
   position: relative;
 `;
+
 const Movements = styled.div`
   display: flex;
   width: 85%;
@@ -136,7 +170,7 @@ const AddTransaction = styled.div`
   font-weight: 700;
   width: 40%;
   height: 60%;
-  margin-top: 5%;
+  margin-top: 20px;
   font-size: 18px;
 `;
 
@@ -157,9 +191,29 @@ const Price = styled.span`
 `;
 
 const Balance = styled.div`
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
   font-weight: 700;
   position: absolute;
   color: #000000;
   bottom: 10px;
   left: 15px;
+
+  span {
+    font-weight: 400;
+    color: ${(props) => (props.balance >= 0 ? "#03AC00" : "#C70000")};
+  }
+`;
+
+const NoRegister = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  width: 85%;
+  height: 70%;
+  border-radius: 5px;
+  text-align: center;
+  color: #868686;
 `;
