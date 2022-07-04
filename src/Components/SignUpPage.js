@@ -151,7 +151,7 @@ const Forms = styled.form`
     &::placeholder {
       color: #000000;
       font-family: "Raleway", sans-serif;
-      padding-left: 10px;
+      padding-left: 15px;
     }
   }
   button {

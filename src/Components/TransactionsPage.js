@@ -1,22 +1,24 @@
 import axios from "axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import TransactionsContext from "./TransactionsContext";
 import {
   IoExitOutline,
   IoAddCircleOutline,
   IoRemoveCircleOutline,
 } from "react-icons/io5";
 export default function TransactionsPage() {
+  const { reloadTransactions } = useContext(TransactionsContext);
   let token = localStorage.getItem("token");
   let name = localStorage.getItem("name");
-
   const navigate = useNavigate();
-  const [allTransactions, setAllTransactions] = useState("");
-  const [reloadTransactions, setReloadTransactions] = useState(false);
-  if (!token) {
-    navigate("/");
-  }
+  const [allTransactions, setAllTransactions] = useState([]);
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, []);
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -38,25 +40,50 @@ export default function TransactionsPage() {
     }
     shownTransactions();
   }, [reloadTransactions]);
+
+  function exit() {
+    localStorage.clear();
+    navigate("/");
+  }
+
+  function ListTransactions() {
+    return (
+      <>
+        {allTransactions.map((value, ind) => (
+          <TransactionStyle key={ind}>
+            <div>
+              <span style={{ color: "#C6C6C6" }}>{value.day}</span>
+              <span>{value.description}</span>
+            </div>
+            <Price status={value.status}>{value.value}</Price>
+          </TransactionStyle>
+        ))}
+      </>
+    );
+  }
+
   return (
     <Container>
       <Header>
         <h1>Olá, {name}</h1>
-        <IoExitOutline color="white" fontSize={"26px"} fontWeight="bold" />
+        <IoExitOutline color="white" fontSize={"26px"} onClick={exit} />
       </Header>
-      <Board>{allTransactions}</Board>
+      <Board>
+        <ListTransactions />
+        <Balance>SALDO: </Balance>
+      </Board>
       <Movements>
-        <Enter>
+        <AddTransaction onClick={() => navigate("/inflow")}>
           <IoAddCircleOutline fontSize={"25px"} />
           Nova <br />
           entrada
-        </Enter>
-        <Exit>
+        </AddTransaction>
+        <AddTransaction onClick={() => navigate("/outflow")}>
           <IoRemoveCircleOutline fontSize={"25px"} />
           Nova
           <br />
           saída
-        </Exit>
+        </AddTransaction>
       </Movements>
     </Container>
   );
@@ -87,6 +114,9 @@ const Board = styled.div`
   width: 85%;
   height: 70%;
   border-radius: 5px;
+  color: black;
+  overflow: auto;
+  position: relative;
 `;
 const Movements = styled.div`
   display: flex;
@@ -95,7 +125,7 @@ const Movements = styled.div`
   justify-content: space-between;
 `;
 
-const Enter = styled.div`
+const AddTransaction = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -109,17 +139,27 @@ const Enter = styled.div`
   margin-top: 5%;
   font-size: 18px;
 `;
-const Exit = styled.div`
+
+const TransactionStyle = styled.div`
   display: flex;
-  flex-direction: column;
+  padding: 23px 12px 0;
+  width: 90%;
   justify-content: space-between;
-  background-color: #a328d6;
-  color: #ffffff;
-  padding: 10px;
-  border-radius: 5px;
+  div {
+    span {
+      padding-right: 5px;
+    }
+  }
+`;
+
+const Price = styled.span`
+  color: ${(props) => (props.status === "inflow" ? "#03AC00" : "#C70000")};
+`;
+
+const Balance = styled.div`
   font-weight: 700;
-  width: 40%;
-  height: 60%;
-  margin-top: 5%;
-  font-size: 18px;
+  position: absolute;
+  color: #000000;
+  bottom: 10px;
+  left: 15px;
 `;

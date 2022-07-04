@@ -1,69 +1,88 @@
-import styled from "styled-components";
-import logo from "../images/MyWallet.png";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Bars } from "react-loader-spinner";
 import axios from "axios";
-export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+import { useState, useContext, useEffect } from "react";
+import { Bars } from "react-loader-spinner";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import TransactionsContext from "./TransactionsContext";
+export default function Outflow() {
+  const { setReloadTransactions, reloadTransactions } =
+    useContext(TransactionsContext);
   const navigate = useNavigate();
+  const [description, setDescription] = useState("");
+  const [value, setValue] = useState("");
   const [disable, setDisable] = useState(false);
-  const [buttonCtt, setButtonCtt] = useState("Entrar");
-  async function signInHandler(event) {
+  const [buttonCtt, setButtonCtt] = useState("Salvar entrada");
+
+  let token = localStorage.getItem("token");
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, []);
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  async function inflowHandler(event) {
     event.preventDefault();
     setButtonCtt(<data.Component {...data.props} />);
     setDisable(true);
 
     let body = {
-      email,
-      password,
+      description,
+      value,
+      status: "outflow",
     };
     try {
-      const resp = await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
-      localStorage.setItem("token", resp.data.token);
-      localStorage.setItem("name", resp.data.name);
-
+      await axios.post(
+        "https://apimywallet.herokuapp.com/transactions",
+        body,
+        config
+      );
+      setReloadTransactions(!reloadTransactions);
       navigate("/transactions");
       setDisable(false);
     } catch (error) {
       console.log(error);
       setDisable(false);
-      setButtonCtt("Entrar");
+      setButtonCtt("Salvar saída");
     }
   }
+
   return (
     <Container>
       <div>
-        <img src={logo} alt="MyWallet Logo" />
-        <Forms onSubmit={signInHandler}>
+        <Header>
+          <h1>Nova saída</h1>
+        </Header>
+
+        <Forms onSubmit={inflowHandler}>
           <Disabled disabled={disable}>
             <input
-              type="text"
-              placeholder="E-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="number"
+              placeholder="Valor"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
               required
               disabled={disable}
             />
             <input
-              type="password"
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              placeholder="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               required
               disabled={disable}
             />
             <button type="submit">{buttonCtt}</button>
           </Disabled>
         </Forms>
-        <Linked to={"/sign-up"}>Primeira vez? Cadastre-se!</Linked>
       </div>
     </Container>
   );
 }
-// putting the input and the button on disable until it waits for the response
+
 function Disabled({ disabled, children }) {
   if (disabled) {
     return (
@@ -75,8 +94,6 @@ function Disabled({ disabled, children }) {
 
   return <>{children}</>;
 }
-
-// the loading symbol
 const data = {
   Component: Bars,
   props: {
@@ -85,15 +102,17 @@ const data = {
     width: 110,
   },
 };
+
 const Container = styled.div`
   width: 100%;
   height: 100vh;
   background-color: #8c11be;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+
   > div {
-    height: 60%;
+    height: 40%;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -101,7 +120,17 @@ const Container = styled.div`
     justify-content: space-around;
   }
 `;
-
+const Header = styled.div`
+  display: flex;
+  margin: 24px 0;
+  width: 85%;
+  justify-content: space-between;
+  h1 {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 26px;
+  }
+`;
 const Forms = styled.form`
   width: 85%;
   display: flex;
@@ -137,10 +166,4 @@ const Forms = styled.form`
     font-size: 20px;
     font-weight: 700;
   }
-`;
-
-const Linked = styled(Link)`
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
 `;
