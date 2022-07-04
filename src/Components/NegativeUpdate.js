@@ -34,7 +34,7 @@ export default function NegativeUpdate() {
     let body = {
       description,
       value,
-      status: "inflow",
+      status: "outflow",
     };
     try {
       await axios.put(
