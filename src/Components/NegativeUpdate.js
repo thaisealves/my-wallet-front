@@ -26,7 +26,7 @@ export default function NegativeUpdate() {
       Authorization: `Bearer ${token}`,
     },
   };
-  async function inflowHandler(event) {
+  async function OutflowHandler(event) {
     event.preventDefault();
     setButtonCtt(<data.Component {...data.props} />);
     setDisable(true);
@@ -59,7 +59,7 @@ export default function NegativeUpdate() {
           <h1>Editar saída</h1>
         </Header>
 
-        <Forms onSubmit={inflowHandler}>
+        <Forms onSubmit={OutflowHandler}>
           <Disabled disabled={disable}>
             <input
               type="text"
