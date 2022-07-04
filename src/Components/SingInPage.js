@@ -24,11 +24,12 @@ export default function SignInPage() {
       const resp = await axios.post("https://apimywallet.herokuapp.com/sign-in", body);
       localStorage.setItem("token", resp.data.token);
       localStorage.setItem("name", resp.data.name);
-
+      console.log(resp.data)
       navigate("/transactions");
       setDisable(false);
     } catch (error) {
       console.log(error);
+      alert(error.response.data)
       setDisable(false);
       setButtonCtt("Entrar");
     }
