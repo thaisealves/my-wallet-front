@@ -9,7 +9,7 @@ import {
   IoRemoveCircleOutline,
 } from "react-icons/io5";
 export default function TransactionsPage() {
-  const { reloadTransactions, setReloadTransactions } =
+  const { reloadTransactions, setReloadTransactions, setPutId } =
     useContext(TransactionsContext);
   let token = localStorage.getItem("token");
   let name = localStorage.getItem("name");
@@ -64,20 +64,14 @@ export default function TransactionsPage() {
           reloadTransactions={reloadTransactions}
           setReloadTransactions={setReloadTransactions}
           config={config}
+          navigate={navigate}
+          setPutId={setPutId}
         />
         <Balance balance={Number(balance)}>
           SALDO <span>{Math.abs(Number(balance)).toFixed(2)}</span>
         </Balance>
       </Board>
     );
-  }
-  async function deleting(id) {
-    if (window.confirm("Tem certeza que deseja apagar esse hábito?")) {
-      await axios.delete(
-        `https://apimywallet.herokuapp.com/transactions/${id}`
-      );
-      setReloadTransactions(!reloadTransactions);
-    }
   }
 
   return (
@@ -110,6 +104,8 @@ function ListTransactions({
   reloadTransactions,
   setReloadTransactions,
   config,
+  navigate,
+  setPutId,
 }) {
   useEffect(() => {
     let newBalance = 0;
@@ -129,7 +125,13 @@ function ListTransactions({
         <TransactionStyle key={ind}>
           <div>
             <span style={{ color: "#C6C6C6" }}>{value.day}</span>
-            <span>{value.description}</span>
+            <span
+              onClick={() =>
+                changing(value._id, navigate, value.status, setPutId)
+              }
+            >
+              {value.description}
+            </span>
           </div>
           <div>
             <Price status={value.status}>
@@ -153,6 +155,15 @@ function ListTransactions({
       ))}
     </>
   );
+}
+async function changing(id, navigate, status, setPutId) {
+  if (status === "inflow") {
+    navigate("/positive-update");
+    setPutId(id);
+  } else if (status === "outflow") {
+    navigate("/negative-update");
+    setPutId(id);
+  }
 }
 async function deleting(id, reloadTransactions, setReloadTransactions, config) {
   if (window.confirm("Tem certeza que deseja apagar esse hábito?")) {
