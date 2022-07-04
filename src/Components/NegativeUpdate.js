@@ -62,7 +62,7 @@ export default function NegativeUpdate() {
         <Forms onSubmit={inflowHandler}>
           <Disabled disabled={disable}>
             <input
-              type="number"
+              type="text"
               placeholder="Valor"
               value={value}
               onChange={(e) => setValue(e.target.value)}
