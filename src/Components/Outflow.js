@@ -24,7 +24,7 @@ export default function Outflow() {
       Authorization: `Bearer ${token}`,
     },
   };
-  async function inflowHandler(event) {
+  async function outflowHandler(event) {
     event.preventDefault();
     setButtonCtt(<data.Component {...data.props} />);
     setDisable(true);
@@ -57,7 +57,7 @@ export default function Outflow() {
           <h1>Nova saída</h1>
         </Header>
 
-        <Forms onSubmit={inflowHandler}>
+        <Forms onSubmit={outflowHandler}>
           <Disabled disabled={disable}>
             <input
               type="text"
