@@ -9,7 +9,8 @@ import {
   IoRemoveCircleOutline,
 } from "react-icons/io5";
 export default function TransactionsPage() {
-  const { reloadTransactions } = useContext(TransactionsContext);
+  const { reloadTransactions, setReloadTransactions } =
+    useContext(TransactionsContext);
   let token = localStorage.getItem("token");
   let name = localStorage.getItem("name");
   const [balance, setBalance] = useState(0);
@@ -32,9 +33,8 @@ export default function TransactionsPage() {
           "https://apimywallet.herokuapp.com/transactions",
           config
         );
-        console.log(resp);
+
         setAllTransactions(resp.data);
-        console.log(allTransactions);
       } catch (error) {
         console.log(error);
       }
@@ -61,12 +61,23 @@ export default function TransactionsPage() {
         <ListTransactions
           allTransactions={allTransactions}
           setBalance={setBalance}
+          reloadTransactions={reloadTransactions}
+          setReloadTransactions={setReloadTransactions}
+          config={config}
         />
         <Balance balance={Number(balance)}>
-          SALDO: <span>{Math.abs(Number(balance)).toFixed(2)}</span>
+          SALDO <span>{Math.abs(Number(balance)).toFixed(2)}</span>
         </Balance>
       </Board>
     );
+  }
+  async function deleting(id) {
+    if (window.confirm("Tem certeza que deseja apagar esse hábito?")) {
+      await axios.delete(
+        `https://apimywallet.herokuapp.com/transactions/${id}`
+      );
+      setReloadTransactions(!reloadTransactions);
+    }
   }
 
   return (
@@ -93,7 +104,13 @@ export default function TransactionsPage() {
   );
 }
 
-function ListTransactions({ allTransactions, setBalance }) {
+function ListTransactions({
+  allTransactions,
+  setBalance,
+  reloadTransactions,
+  setReloadTransactions,
+  config,
+}) {
   useEffect(() => {
     let newBalance = 0;
     for (let i = 0; i < allTransactions.length; i++) {
@@ -102,7 +119,6 @@ function ListTransactions({ allTransactions, setBalance }) {
       } else if (allTransactions[i].status === "outflow") {
         newBalance -= Number(allTransactions[i].value);
       }
-      console.log(newBalance);
     }
     setBalance(newBalance);
   }, [allTransactions]);
@@ -115,11 +131,41 @@ function ListTransactions({ allTransactions, setBalance }) {
             <span style={{ color: "#C6C6C6" }}>{value.day}</span>
             <span>{value.description}</span>
           </div>
-          <Price status={value.status}>{Number(value.value).toFixed(2)}</Price>
+          <div>
+            <Price status={value.status}>
+              {Number(value.value).toFixed(2)}
+            </Price>
+            <span
+              style={{ color: "#C6C6C6" }}
+              onClick={() =>
+                deleting(
+                  value._id,
+                  reloadTransactions,
+                  setReloadTransactions,
+                  config
+                )
+              }
+            >
+              X
+            </span>
+          </div>
         </TransactionStyle>
       ))}
     </>
   );
+}
+async function deleting(id, reloadTransactions, setReloadTransactions, config) {
+  if (window.confirm("Tem certeza que deseja apagar esse hábito?")) {
+    try {
+      await axios.delete(
+        `https://apimywallet.herokuapp.com/transactions/${id}`,
+        config
+      );
+      setReloadTransactions(!reloadTransactions);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 const Container = styled.div`
@@ -181,12 +227,13 @@ const TransactionStyle = styled.div`
   justify-content: space-between;
   div {
     span {
-      padding-right: 5px;
+      padding-right: 8px;
     }
   }
 `;
 
 const Price = styled.span`
+  margin-right: 8px;
   color: ${(props) => (props.status === "inflow" ? "#03AC00" : "#C70000")};
 `;
 

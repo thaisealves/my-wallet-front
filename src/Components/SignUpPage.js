@@ -26,11 +26,10 @@ export default function SignUpPage() {
       password,
       passConfirm,
     };
-    console.log(body);
     const validation = signUpSchema.validate(body);
 
     if (validation.error) {
-      alert("Confirmação de senha não condiz!")
+      alert("Confirmação de senha não condiz!");
       setDisable(false);
       setButtonCtt("Cadastrar");
       return;
